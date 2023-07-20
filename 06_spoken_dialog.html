@@ -1,0 +1,156 @@
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>Spoken Dialog by Javascript</title>
+<link rel="stylesheet" href="mayo.css">
+</head>
+<body>
+
+<h1>マヨネーズマスターとふれあおう</h1>
+
+<p>
+<button id="startButton">スタート</button>
+<button id="stopButton">ストップ</button>
+</p>
+
+<p>
+<div id="resultOutput"></div>
+</p>
+
+<script>
+// 応答の定義（ハッシュ）    
+var response = {
+	"お兄さん":"あいよ！\n",
+	"おっさん":"お兄さんだ。\n",
+    "誰":"俺は、マヨネーズマスターだ。\n",
+    "何歳":"52歳だ。\n",
+    "元気ですか":"フッ、最近医者に高血圧と診断されたぜ。\n",
+    "好きな食べ物":"マヨネーズだ。\n",
+	"好きな色":"マヨネーズ色だ。\n",
+	"卵焼き":"マヨネーズだ。\n",
+	"利き手":"右利きだ。\n",
+	"夢は":"マヨネーズの海で泳ぐことだ。\n",
+	"マヨネーズ":"マヨネーズ。\n"
+};
+
+var response2 = {
+	"お兄さん":"そう呼んでくれてうれしいぜ。",
+	"おっさん":"お兄さんだ。",
+    "誰":"お兄さんと呼んでくれてもいいぞ！",
+    "何歳":"心はまだまだお兄さんだ。",
+    "元気ですか":"おぬしは体調に気をつかえよ！",
+    "好きな食べ物":"マヨネーズこそが嗜好の食べ物だ。",
+	"好きな色":"優しさを感じる暖かい色だからな。",
+	"卵焼き":"醤油でもソースでもなくマヨネーズだ。",
+	"利き手":"マヨを絞る時だけは両利きだがな。",
+	"夢は":"そんな海があったら素晴らしいだろう？",
+	"マヨネーズ":"マヨネーズ!!"
+};
+    
+const startButton = document.querySelector('#startButton'); // 開始ボタン
+const stopButton = document.querySelector('#stopButton'); // 停止ボタン
+const resultOutput = document.querySelector('#resultOutput'); // 結果出力エリア
+if (!'SpeechSynthesisUtterance' in window) {
+    alert("あなたのブラウザはSpeech Synthesis APIに未対応です。");
+}
+const tts = new SpeechSynthesisUtterance(); // TTSインスタンスを生成
+//tts.text = textForm.value; // テキストを設定
+tts.lang = "ja-JP"; // 言語(日本語)、英語の場合はen-US
+tts.rate = 1.0; // 速度
+tts.pitch = 0.2; // 声の高さ
+tts.volume = 1.0; // 音量
+
+SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+if (!'SpeechRecognition' in window) {
+    alert("あなたのブラウザはSpeech Recognition APIに未対応です。");
+}
+const asr = new SpeechRecognition(); // ASRインスタンスを生成
+asr.lang = "ja-JP"; // 言語（日本語）
+asr.interimResults = true; // 途中結果出力をオン
+asr.continuous = true; // 継続入力をオン
+
+let output = ''; // 出力
+
+let count=0;//名前を聞いたかを記録
+let bangou=0;
+let face='';
+let yourname='';//質問者の名前
+let ossan='';
+// 認識結果が出力されたときのイベントハンドラ
+asr.onresult = function(event){
+    let transcript = event.results[event.resultIndex][0].transcript; // 結果文字列
+	
+	let output_not_final = '';
+	if(count!=0){
+		if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
+			asr.abort(); // 音声認識を停止
+			bangou++;
+			if(transcript.indexOf("おっさん")>-1){// ★おっさんが含まれていると、指摘する（複数キーワード）
+				face='(# ﾟДﾟ)';　　　　　　　　　　　　　　//　★おっさんと言って以降は怒った顔文字が付く（過去の認識結果を用いる）
+				ossan="<br>"+'おっさん言うな。';
+			}else if(transcript.indexOf("兄さん")>-1){
+				face='(^o^)／';　　　　　　　　　　　　　　//　★お兄さんと言って以降は嬉しそうな顔文字が付く（過去の認識結果を用いる）
+				ossan='';
+			} else {
+				ossan='';
+			}
+			let a=0;
+			for(let key in response){// ★特定のキーワードが入っていたら返答（部分一致）
+				if(transcript.indexOf(key)>-1){
+					outputY='<div class="yourOutput">' +transcript + '</div>' + '<br>';
+					outputM= '<div class="mayoOutput">'+response[key]+ yourname+ "よ、" + response2[key]+ossan;
+					a=1;
+				}
+			}
+			if(a==0){
+				outputY='<div class="yourOutput">' +transcript + '</div>' + '<br>';
+				outputM='<div class="mayoOutput">'+ "その質問には答えられない。　他の質問を頼むぜ"+ossan;
+			}
+			resultOutput.innerHTML = output + outputY+outputM+ face +'</div>';
+			output += outputY + outputM + face +'</div>'+ '<br>';
+			tts.text =outputM;
+			// 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
+			tts.onend = function(event){
+				asr.start(); // 音声認識を再開
+			}
+			speechSynthesis.speak(tts); // 再生
+		} else { // 結果がまだ未確定のとき
+			output_not_final = '<div class="yourOutput">'+'<span style="color:#ddd;">' + transcript + '</span></div>';
+			resultOutput.innerHTML = output + output_not_final;
+		}
+	}else if(event.results[event.resultIndex].isFinal){// ★最初の質問で名前を聞く　それ以降のやり取りで名前を呼んでくれるように（過去の認識結果を用いる）
+		asr.abort(); // 音声認識を停止
+		yourname=transcript;
+		tts.text="そうか" + yourname + "というのだな。質問はなんだね？";
+		speechSynthesis.speak(tts); // 再生
+		count+=1;
+		tts.onend = function(event){
+			asr.start(); // 音声認識を再開
+		}
+	}
+}
+
+// 開始ボタンのイベントハンドラ
+startButton.addEventListener('click', function() {
+	if (count==0){
+		tts.text="あらたなるマヨネーズの戦士よ、お主の名を教えてくれないか";
+		speechSynthesis.speak(tts); // 再生
+		tts.onend=function(event){
+			asr.start();
+		}
+	}else{
+		asr.start();
+	}
+})
+
+// 停止ボタンのイベントハンドラ
+stopButton.addEventListener('click', function() {
+    asr.stop();
+})
+</script>
+
+</body>
+</html>
