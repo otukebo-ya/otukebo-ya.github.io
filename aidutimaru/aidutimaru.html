@@ -75,7 +75,7 @@ asr.onresult = function(event){
 		if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
 			asr.abort(); // 音声認識を停止
 			bangou++;
-			if(transcript.indexOf("Alexa")>-1){// ★アレクサが含まれていると、指摘する（複数キーワード）
+			if(transcript.indexOf("頷く丸")>-1){// ★頷く丸が含まれていると、指摘する（複数キーワード）
 				face='(# ﾟДﾟ)';// ★アレクサと言って以降は怒った顔文字が付く（過去の認識結果を用いる）
 				aidutimaru="<br>"+'名前間違ってるよね。ぷんすか！！';
 				mistake=true;
