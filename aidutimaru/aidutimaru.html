@@ -1,0 +1,147 @@
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<title>Spoken Dialog by Javascript</title>
+<link rel="stylesheet" href="aiduti.css">
+</head>
+<body>
+
+<h1>相槌丸</h1>
+
+<p>
+<button id="startButton">スタート</button>
+<button id="stopButton">ストップ</button>
+</p>
+
+<p>
+<div id="resultOutput"></div>
+</p>
+
+<script>
+// 応答の定義（ハッシュ）    
+var response3 = {
+	"相槌丸":["うんうん！\n","相槌丸だよ。"],
+	"アレクサ":["ううん。\n","なんか違うなあ。"],
+    "誰":["うんうん。　俺は、相槌丸だ。\n","よろしくね！"],
+    "何歳":["うんうん。気になるよね。\n","僕は21歳さ。"],
+    "元気ですか":["うんうん。僕のことを心配してくれるんだね。\n","元気さ！　ありがとう。"],
+    "好きな食べ物":["うんうん。\n","お餅かな。"],
+	"好きな色":["うんうん。\n","熱された鉄のような赤色が好きさ。"],
+	"卵焼き":["うんうん。卵焼きにはマヨネーズがいいと思うよ。\n","醤油でもソースでもなくマヨネーズだね。"],
+	"利き手":["うんうん。右利きさ。\n","うんうん。"],
+	"夢は":["うんうん。きになるよね。。\n","全世界の人々の話に相槌を打つことだよ!"],
+	"うんうん":["うんうん。\n","キミの頷きはとても素晴らしいよ!!"]
+};
+
+const startButton = document.querySelector('#startButton'); // 開始ボタン
+const stopButton = document.querySelector('#stopButton'); // 停止ボタン
+const resultOutput = document.querySelector('#resultOutput'); // 結果出力エリア
+if (!'SpeechSynthesisUtterance' in window) {
+    alert("あなたのブラウザはSpeech Synthesis APIに未対応です。");
+}
+const tts = new SpeechSynthesisUtterance(); // TTSインスタンスを生成
+//tts.text = textForm.value; // テキストを設定
+tts.lang = "ja-JP"; // 言語(日本語)、英語の場合はen-US
+tts.rate = 1.3; // 速度
+tts.pitch = 0.2; // 声の高さ
+tts.volume = 1.0; // 音量
+
+SpeechRecognition = webkitSpeechRecognition || SpeechRecognition;
+if (!'SpeechRecognition' in window) {
+    alert("あなたのブラウザはSpeech Recognition APIに未対応です。");
+}
+const asr = new SpeechRecognition(); // ASRインスタンスを生成
+asr.lang = "ja-JP"; // 言語（日本語）
+asr.interimResults = true; // 途中結果出力をオン
+asr.continuous = true; // 継続入力をオン
+
+let output = ''; // 出力
+
+let count=0;//名前を聞いたかを記録
+let bangou=0;
+let face='';
+let yourname='';//質問者の名前
+let aidutimaru='';
+let mistake=false;
+// 認識結果が出力されたときのイベントハンドラ
+asr.onresult = function(event){
+    let transcript = event.results[event.resultIndex][0].transcript; // 結果文字列
+	
+	let output_not_final = '';
+	if(count!=0){
+		if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
+			asr.abort(); // 音声認識を停止
+			bangou++;
+			if(transcript.indexOf("アレクサ")>-1){// ★おっさんが含まれていると、指摘する（複数キーワード）
+				face='(# ﾟДﾟ)';// ★おっさんと言って以降は怒った顔文字が付く（過去の認識結果を用いる）
+				aidutimaru="<br>"+'名前間違ってるよね。ぷんすか！！';
+				mistake=true;
+			}else if(transcript.indexOf("相槌丸")>-1&&mistake){
+				face='(^o^)／';// ★お兄さんと言って以降は嬉しそうな顔文字が付く（過去の認識結果を用いる）
+				aidutimaru='';
+				mistake=false;
+			} else {
+				aidutimaru='';
+			}
+			let answer=false;
+			let keys = Object.keys(response3);
+			keys.forEach(function(key){// ★特定のキーワードが入っていたら返答（部分一致）
+				if(transcript.indexOf(key)>-1){
+					outputY='<div class="yourOutput">' +transcript + '</div>' + '<br>';
+					outputM= '<div class="mayoOutput">'+response3[key][0]+ yourname+ "さん。" + response3[key][1]+aidutimaru;
+					answer=true;
+				}
+			});
+			if(!answer){
+				outputY='<div class="yourOutput">' +transcript + '</div>' + '<br>';
+				outputM='<div class="mayoOutput">'+ "ううむぅ。その質問には答えられないなあ。ごめんね。"+aidutimaru;
+			}
+			resultOutput.innerHTML = output + outputY+outputM+ face +'</div>';
+			output += outputY + outputM + face +'</div>'+ '<br>';
+			tts.text =outputM;
+			// 再生が終了（end）ときのイベントハンドラ（終了したときに実行される）
+			tts.onend = function(event){
+				asr.start(); // 音声認識を再開
+			}
+			speechSynthesis.speak(tts); // 再生
+		} else { // 結果がまだ未確定のとき
+			output_not_final = '<div class="yourOutput">'+'<span style="color:#ddd;">' + transcript + '</span></div>';
+			resultOutput.innerHTML = output + output_not_final;
+		}
+	}else if(event.results[event.resultIndex].isFinal){// ★最初の質問で名前を聞く それ以降のやり取りで名前を呼んでくれるように（過去の認識結果を用いる）
+		asr.abort(); // 音声認識を停止
+		yourname=transcript;
+		tts.text="そうか" + yourname + "というんだね。質問はなにかな？";
+		speechSynthesis.speak(tts); // 再生
+		count+=1;
+		tts.onend = function(event){
+			asr.start(); // 音声認識を再開
+		}
+	}
+}
+
+// 開始ボタンのイベントハンドラ
+startButton.addEventListener('click', function() {
+	if (count==0){
+		tts.text="僕は相槌丸。キミの名前は何だい？";
+		speechSynthesis.speak(tts); // 再生
+		tts.onend=function(event){
+			asr.start();
+		}
+	}else{
+		asr.start();
+	}
+})
+
+// 停止ボタンのイベントハンドラ
+stopButton.addEventListener('click', function() {
+	asr.abort();
+    asr.stop();
+})
+</script>
+
+</body>
+</html>
