@@ -75,12 +75,12 @@ asr.onresult = function(event){
 		if (event.results[event.resultIndex].isFinal) { // 結果が確定（Final）のとき
 			asr.abort(); // 音声認識を停止
 			bangou++;
-			if(transcript.indexOf("アレクサ")>-1){// ★おっさんが含まれていると、指摘する（複数キーワード）
-				face='(# ﾟДﾟ)';// ★おっさんと言って以降は怒った顔文字が付く（過去の認識結果を用いる）
+			if(transcript.indexOf("Alexa")>-1){// ★アレクサが含まれていると、指摘する（複数キーワード）
+				face='(# ﾟДﾟ)';// ★アレクサと言って以降は怒った顔文字が付く（過去の認識結果を用いる）
 				aidutimaru="<br>"+'名前間違ってるよね。ぷんすか！！';
 				mistake=true;
 			}else if(transcript.indexOf("相槌丸")>-1&&mistake){
-				face='(^o^)／';// ★お兄さんと言って以降は嬉しそうな顔文字が付く（過去の認識結果を用いる）
+				face='(^o^)／';// ★相槌丸と言って以降は嬉しそうな顔文字が付く（過去の認識結果を用いる）
 				aidutimaru='';
 				mistake=false;
 			} else {
