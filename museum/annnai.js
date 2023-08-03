@@ -79,6 +79,18 @@ asr.onresult = async function(event) {
 			console.log("key",key);
 			  img="<div class='map'>地図画像</div>"
 		}
+		if(key=="大人用"&&child){
+			document.getElementById('adultOrChild').innerText="おとなようへ";
+			document.getElementById('title').innerText="案内";
+			child=false;
+			console.log("大人へ",child);
+		}
+		if(key=="子供用"&&!(child)){
+			document.getElementById('adultOrChild').innerText="こどもようへ";
+			document.getElementById('title').innerText="あんない";
+			child=true;
+			console.log("こどもへ",child);
+		}
         break; // 応答が見つかったらループを抜ける
       }
     }
@@ -86,8 +98,16 @@ asr.onresult = async function(event) {
     console.log("コンソール", answer);
 
     if (!answer) {
+		if (child) {
+          let hiragana = await makeHiraganaText(transcript);
+          console.log("ひらがな", hiragana);
+          outputY = '<div class="yourOutput">' + hiragana + '</div>' + '<br>';
+          outputM = '<div class="mayoOutput">' + "ごめんね。";
+          answer = true;
+        } else {
       outputY = '<div class="yourOutput">' + transcript + '</div>' + '<br>';
       outputM = '<div class="mayoOutput">' + "ごめんね。";
+		}
     }
 
     resultOutput.innerHTML = output + outputY + outputM + '</div>'+img;
