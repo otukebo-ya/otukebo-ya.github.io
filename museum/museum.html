@@ -7,19 +7,29 @@
 <title>Spoken Dialog by Javascript</title>
 <link rel="stylesheet" href="annnai.css">
 </head>
-<body>
-
-<h1 id="title">案内</h1>
-
+<body onload="showNowWeather()">
+<div id="titleAndButton">
+	<img id="title" src="images/title2.png"/>
+	<button id="startButton"><img src="images/start.png" id="startButtonImg" /></button>
+	<button id="stopButton"><img src="images/stop.png" id="stopButtonImg" /></button>
+	<button id="adultOrChild"><img src="images/child.png" id="adultOrChildImgs"/></button>
+</div>
 <p>
-<button id="startButton">スタート</button>
-<button id="stopButton">ストップ</button>
-<button id="adultOrChild">こどもようへ</button>
 </p>
-
 <p>
-<div id="resultOutput"></div>
+<div id="display">
+	<div id="resultOutput"></div>
+</div>
 </p>
+<p id="credit">Web Services by Yahoo! JAPAN （https://developer.yahoo.co.jp/sitemap/）</p>
+<div id="dateAndWeather">
+	<div id="weather">
+		<img id="nowWeatherImg" src="" alt="今の天気の画像"></img>
+		<img id="arrow" src="images/arrow.png" alt="次の天気の画像"></img>
+		<img id="nextWeatherImg" src="" alt="次の天気の画像"></img>
+		<p id="dateAndTime"></p>
+	</div>
+</div>
 </body>
 <script src="annnai.js"></script>
 </html>

@@ -1,25 +1,195 @@
 body {
 	background-color:#fcfcc7;
+	font-size:0px;
+	margin: 0;
+	padding: 0;
 }
 
 .yourOutput{
 	background-color:#ffffff;
 	width:60%;
-	margin-left:10%;
+	margin-left:30%;
 	border: 10px groove #31A9EE;
 }
 
-.mayoOutput{
+.naviOutput{
 	background-color:#ffffff;
 	width:60%;
-	margin-left:30%;
+	margin-left:10%;
 	border: 10px groove #ED32A8;
 }
 
 .map{
-	width:80%;
-	height:100px;
+	position:relative;
+	width:600px;
 	background-color:#ffffff;
 	border: 10px groove #0000ff;
 	margin-left:10%;
+}
+
+.mapImage{
+	width:600px;
+	height:auto;
+}
+
+.pin{
+	z-index:10;
+	position:absolute;
+	width:60px;
+	height:auto;
+}
+
+#titleAndButton{
+	position:relative;
+	background-color:#8b4513;
+	position:relative;
+	height:15%;
+	width:100%;
+	box-shadow: 0 5px 10px 0 #deb887;
+}
+
+#title{
+	position:absolute;
+	left:30px;
+	height:100%;
+	width:auto;
+
+}
+
+#startButton{
+	width:200px;
+	position:absolute;
+	padding: 0;
+	margin:0;
+	right:calc(50% + 30px);
+	background: none;
+	cursor: pointer;
+	border:5px solid #939393;
+	border-radius:10px;
+	overflow: hidden;
+	box-shadow: 4px 4px 4px black;
+	transition: box-shadow 0.1s;
+}
+#startButton:active {
+    box-shadow: 1px 1px 1px gray;
+ }
+
+#startButton:active img {
+    opacity: 0.5;
+}
+
+#startButtonImg{
+	width:100%;
+	height:auto;
+}
+
+
+#stopButton{
+	width:200px;
+	position:absolute;
+	padding: 0;
+	margin:0;
+	left:calc(50% + 30px);
+	background: none;
+	cursor: pointer;
+	border:5px solid #939393;
+	border-radius:10px;
+	overflow: hidden;
+	box-shadow: 4px 4px 4px black;
+	transition: box-shadow 0.1s;
+}
+#stopButton:active {
+    box-shadow: 1px 1px 1px gray;
+}
+
+#stopButton:active img {
+    opacity: 0.5;
+}
+
+#stopButtonImg{
+	width:100%;
+	height:auto;
+}
+
+#adultOrChild{
+	position:absolute;
+	right:30px;
+	width:200px;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+	border:5px solid #939393;
+	border-radius:10px;
+	overflow: hidden;
+	box-shadow: 4px 4px 4px black;
+	transition: box-shadow 0.1s;
+}
+#adultOrChild:active {
+    box-shadow: 1px 1px 1px gray;
+ }
+
+#adultOrChild:active img {
+    opacity: 0.5;
+  }
+#adultOrChildImgs{
+	width:100%;
+	height:auto;
+}
+
+#display{
+	margin-top:30px;
+	background-color:#fff;
+	width:90%;
+	margin-left:5%;
+	margin-right:5%;
+	height:70%;
+	border: 10px groove #12cd57;
+	box-sizing: border-box;
+	overflow:scroll;
+}
+
+#resultOutput{
+	font-size:20px;
+}
+
+#credit{
+	font-size:20px;
+	position:absolute;
+	bottom:60px;
+	right:0px;
+}
+
+#dateAndWeather{
+	z-index:15;
+	position:absolute;
+	left:0px;
+	bottom:0px;
+	margin:0px;
+	padding:0px;
+	height:60px;
+	width:100%;
+	background-color:#8b4513;
+	color:#fff;
+	box-shadow: 0 -5px 10px 0 #deb887;
+}
+
+#weather{
+	display: inline-flex;
+	height:60px;
+	margin:0px;
+	padding:0px;
+}
+#nowWeatherImg{
+	margin-left:30px;
+}
+
+#arrow{
+	margin-left:30px;
+	margin-right:30px;
+}
+#dateAndTime{
+	position: absolute;
+	right:30px;
+	font-size:20px;
+	color:#fff;
 }
